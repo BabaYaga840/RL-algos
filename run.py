@@ -12,24 +12,29 @@ from utils.q_net import Q_network
 from utils.Replay import ReplayMemory
 from models.DQN import DQN
 
+with open("config.yaml") as f:
+    cfg=yaml.load(f, Loader=yaml.FullLoader)
 
-# PARAMETERS 
-num_iterations = 1000 
+# PARAMETERS
+environ=cfg["env"]
 
-replay_buffer_max_length = 10000
+cfgm=cfg["model"]
+num_iterations = cfgm["num_iterations"]
 
-batch_size = 64  
+replay_buffer_max_length = cfgm["replay_buffer_max_length"]
 
-learning_rate = 1e-1  
-gamma = 0.99
-epsilon = 0.05
+batch_size = cfgm["batch_size"]  
+
+learning_rate = cfgm["learning_rate"]  
+gamma = cfgm["gamma"]
+epsilon = cfgm["epsilon"]
 
 re=[]
 
-def dqn(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=gamma, policy="egreedy", epsilon=epsilon):
+def dqn(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=gamma, policy="egreedy", epsilon=epsilon, environ=environ):
     global re
-    env = gym.make("CartPole-v1", max_episode_steps=1000)
-    eval_env = gym.make("CartPole-v1")
+    env = gym.make(environ, max_episode_steps=1000)
+    eval_env = gym.make(environ)
     rewards=[]
     agent = DQN(replay_buffer_max_length,
                         env.action_space.n, 
@@ -66,8 +71,8 @@ if __name__ == "__main__":
     
     # track hyperparameters and run metadata
     config={
-        "environment": "Cartpole",
-        "Algorithm": "DQN",
+        "environment": environ,
+        "Algorithm": algo,
     "num_iterations": num_iterations,
     "replay_buffer_max_length": replay_buffer_max_length,
     "batch_size": batch_size,
