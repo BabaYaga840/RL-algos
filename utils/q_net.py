@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import wandb
 
 class Q_network(nn.Module):
-  def __init__(self, state_s, action_s, learning_rate):
+  def __init__(self, state_s, action_s, learning_rate, num=0):
     super(Q_network, self).__init__()
     self.learning_rate = learning_rate
     self.Q_sa = np.zeros((state_s,action_s))
@@ -19,6 +19,7 @@ class Q_network(nn.Module):
     self.layer3 = nn.Linear(128, action_s)
     self.optimizer = optim.Adam(self.parameters(), lr=learning_rate)
     self.criterion = nn.MSELoss()
+    self.num = num
   
   def forward(self, x):
     x = F.relu(self.layer1(x))
@@ -28,6 +29,6 @@ class Q_network(nn.Module):
   def optimize(self,a,b):
     self.optimizer.zero_grad()  
     loss = self.criterion(a,b)  
-    wandb.log({"loss": loss})
+    wandb.log({f"loss{self.num}": loss})
     loss.backward()  
     self.optimizer.step()  

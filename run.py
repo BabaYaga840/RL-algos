@@ -8,6 +8,7 @@ import torch.nn.functional as F
 import gym
 import matplotlib.pyplot as plt
 import wandb
+import yaml
 from utils.q_net import Q_network
 from utils.Replay import ReplayMemory
 from models.DQN import DQN

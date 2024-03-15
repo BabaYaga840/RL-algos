@@ -14,20 +14,20 @@ from utils.Replay import ReplayMemory
 class dDQN():
   def __init__(self, buffer_size, action_s, state_s, epsilon, gamma, lr):
     self.buffer_size=buffer_size
-    self.replay_buffer=ReplayMemory(self.buffer_size)
+    self.replay_buffer=ReplayMemory(self.buffer_size,6)
     self.action_s=action_s
     self.state_s=state_s
     self.epsilon=epsilon
     self.lr=lr
-    self.q_a=Q_network(self.state_s, self.action_s, self.lr)
-    self.q_b=Q_network(self.state_s, self.action_s, self.lr)
+    self.q_a=Q_network(self.state_s, self.action_s, self.lr, 0)
+    self.q_b=Q_network(self.state_s, self.action_s, self.lr, 1)
     self.gamma=gamma
 
 
   def get_action(self,s,ch):
     s = np.array(s)
     s = torch.from_numpy(s).float()
-    if np.random.rand(1)<epsilon:
+    if np.random.rand(1)<self.epsilon:
       return np.random.rand(self.action_s)
     elif ch==0:
       with torch.no_grad():

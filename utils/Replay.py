@@ -11,11 +11,12 @@ import wandb
 
 class ReplayMemory():
 
-    def __init__(self, capacity):
+    def __init__(self, capacity, size):
         self.memory = deque([], maxlen=capacity)
+        self.size = size
 
     def push(self, list):
-        assert len(list)==5
+        assert len(list)==self.size
         self.memory.append(list)
 
     def sample(self, batch_size):
