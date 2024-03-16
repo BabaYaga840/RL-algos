@@ -13,6 +13,7 @@ from utils.q_net import Q_network
 from utils.Replay import ReplayMemory
 from models.DQN import DQN
 from models.dDQN import dDQN
+from models.TargetDQN import TarDQN
 
 
 with open("config.yaml") as f:
@@ -47,6 +48,9 @@ def dqn(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=gamma, po
                         epsilon=epsilon, 
                         gamma=gamma,
                         lr=learning_rate)
+    print("---------------------------------------------------------")
+    print("running plain DQN")
+    print("---------------------------------------------------------")
     observation = env.reset(seed=42)
     for iteration in range(n_timesteps):
         state = env.reset()
@@ -80,6 +84,10 @@ def ddqn(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=gamma, p
                         epsilon=epsilon, 
                         gamma=gamma,
                         lr=learning_rate)
+    print("---------------------------------------------------------")
+    print("Running Double DQN")
+    print("---------------------------------------------------------")
+
     observation = env.reset(seed=42)
     for iteration in range(n_timesteps):
         state = env.reset()
@@ -114,6 +122,9 @@ def tardqn(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=gamma,
                         epsilon=epsilon, 
                         gamma=gamma,
                         lr=learning_rate, tau)
+    print("---------------------------------------------------------")
+    print("Running DQN with Target Network")
+    print("---------------------------------------------------------")
     observation = env.reset(seed=42)
     for iteration in range(n_timesteps):
         state = env.reset()
