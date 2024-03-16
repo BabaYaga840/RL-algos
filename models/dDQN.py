@@ -19,8 +19,8 @@ class dDQN():
     self.state_s=state_s
     self.epsilon=epsilon
     self.lr=lr
-    self.q_a=Q_network(self.state_s, self.action_s, self.lr, 0)
-    self.q_b=Q_network(self.state_s, self.action_s, self.lr, 1)
+    self.q_a=Q_network(self.state_s, self.action_s, self.lr, num=0)
+    self.q_b=Q_network(self.state_s, self.action_s, self.lr, num=1)
     self.gamma=gamma
 
 

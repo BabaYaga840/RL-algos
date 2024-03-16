@@ -19,8 +19,8 @@ class TarDQN():
     self.state_s=state_s
     self.epsilon=epsilon
     self.lr=lr
-    self.q_net=Q_network(self.state_s, self.action_s, self.lr, 0)
-    self.q_tar=Q_network(self.state_s, self.action_s, self.lr, 1)
+    self.q_net=Q_network(self.state_s, self.action_s, self.lr, num=0)
+    self.q_tar=Q_network(self.state_s, self.action_s, self.lr, num=1)
     self.q_tar.load_state_dict(self.q_net.state_dict())
     self.gamma=gamma
     self.tau=tau
