@@ -25,14 +25,15 @@ class Policy(nn.Module):
   def forward(self, x):
     x = F.relu(self.layer1(x))
     x = self.layer2(x)
-    x = nn.functional.softmax(x, dim=1)
+    x = nn.functional.softmax(x, dim=0)
     return x
 
 
   def optimize(self,states,actions,FinalRewards):
     for state,action,G in zip(states,actions,FinalRewards):
-      prob=self(state)
-      log_prob=Categorical(probs=probs)
+      prob=self(torch.from_numpy(state))
+      dist=Categorical(probs=prob)
+      log_prob=dist.log_prob(torch.tensor(action))
       loss = -log_prob*G
       self.optimizer.zero_grad()  
       wandb.log({f"loss{self.num}": loss})
