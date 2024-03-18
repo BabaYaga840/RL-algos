@@ -8,3 +8,4 @@ model:
 	gamma: 0.99
 	epsilon: 0.05
 	tau: 0.01
+	critic_weightage: 0.5
