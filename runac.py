@@ -27,12 +27,12 @@ gamma = cfgm["gamma"]
 
 re=[]
 
-def RF(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=gamma, environ=environ):
+def ActorCritic(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=gamma, environ=environ):
     global re
     env = gym.make(environ, max_episode_steps=1000)
     eval_env = gym.make(environ)
     rewards=[]    
-    agent = REINFORCE(env.action_space.n, 
+    agent = AC(env.action_space.n, 
                         env.observation_space.shape[0],
                         gamma=gamma,
                         lr=learning_rate)
@@ -66,21 +66,25 @@ def RF(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=gamma, env
 
 
         FinalRewards=[]
+        value_loss=torch.tensor(0)
         for i in range(len(rewards)):
             G=0.0
             for j,r in enumerate(rewards[i:]):
                 G +=r*(gamma**j)
-                agent.q_net.optimize(G,delqs[i])
-                G=G++delqs[i+1]-delqs[i]
+                value_loss = value_loss + (delqs[i]-G)**2
+                #agent.q_net.optimize(torch.tensor(G),delqs[i])
+                G=G+delqs[i+1]-delqs[i]
             FinalRewards.append(G)
         agent.policy_net.optimize(states,actions,rewards)
+        value_loss.backward()
     return rewards
+
 
 
 
 if __name__ == "__main__":
     wandb.init(
-    project="my-awesome-project",
+    project="RL-algos",
     config={
         "environment": environ,
         "Algorithm": algo,
@@ -89,7 +93,7 @@ if __name__ == "__main__":
     "gamma": gamma,
     }
     )    
-    rewards=RF()
+    rewards=ActorCritic()
     wandb.finish()
 
 

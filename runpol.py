@@ -74,7 +74,7 @@ def RF(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=gamma, env
 
 if __name__ == "__main__":
     wandb.init(
-    project="my-awesome-project",
+    project="RL-algos",
     config={
         "environment": environ,
         "Algorithm": algo,

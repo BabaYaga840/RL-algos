@@ -150,10 +150,8 @@ def tardqn(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=gamma,
 
 if __name__ == "__main__":
     wandb.init(
-    # set the wandb project where this run will be logged
-    project="my-awesome-project",
+    project="RL-algos",
     
-    # track hyperparameters and run metadata
     config={
         "environment": environ,
         "Algorithm": algo,

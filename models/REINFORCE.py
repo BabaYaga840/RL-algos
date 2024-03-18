@@ -16,14 +16,14 @@ class REINFORCE():
     self.action_s=action_s
     self.state_s=state_s
     self.lr=lr
-    self.poicy_net=Policy(self.state_s, self.action_s, self.lr)
+    self.policy_net=Policy(self.state_s, self.action_s, self.lr)
     self.gamma=gamma
 
 
   def get_action(self,s):
     s = np.array(s)
     s = torch.from_numpy(s).float()
-    probs = self.poicy_net(s)
+    probs = self.policy_net(s)
     m = Categorical(probs)
     action = m.sample()
     return action.item()
