@@ -9,7 +9,7 @@ import gym
 import matplotlib.pyplot as plt
 import wandb
 import yaml
-from models.AC import AC
+from models.AC import A2C
 
 
 with open("config.yaml") as f:
@@ -32,7 +32,7 @@ def ActorCritic(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=g
     env = gym.make(environ, max_episode_steps=1000)
     eval_env = gym.make(environ)
     rewards=[]    
-    agent = AC(env.action_space.n, 
+    agent = A2C(env.action_space.n, 
                         env.observation_space.shape[0],
                         gamma=gamma,
                         lr=learning_rate)

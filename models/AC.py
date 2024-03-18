@@ -13,7 +13,7 @@ from utils.policy_net import Policy
 from utils.q_net import Q_network
 
 
-class AC():
+class A2C():
   def __init__(self, action_s, state_s, gamma, lr):
     self.action_s=action_s
     self.state_s=state_s
