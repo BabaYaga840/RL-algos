@@ -14,17 +14,18 @@ class Q_network(nn.Module):
     super(Q_network, self).__init__()
     self.learning_rate = learning_rate
     self.Q_sa = np.zeros((state_s,action_s))
-    self.layer1 = nn.Linear(state_s, 128)
-    self.layer2 = nn.Linear(128, 128)
-    self.layer3 = nn.Linear(128, action_s)
+    self.layer1 = nn.Linear(state_s, 32)
+    #self.layer2 = nn.Linear(128, 128)
+    self.layer3 = nn.Linear(32, action_s)
     self.optimizer = optim.Adam(self.parameters(), lr=learning_rate)
     self.criterion = nn.MSELoss()
     self.num = num
   
   def forward(self, x):
     x = F.relu(self.layer1(x))
-    x = F.relu(self.layer2(x))
-    return self.layer3(x)
+    x = F.relu(self.layer3(x))
+    return x
+    #return self.layer3(x)
 
   def optimize(self,a,b):
     self.optimizer.zero_grad()  
