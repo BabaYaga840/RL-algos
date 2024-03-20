@@ -11,6 +11,8 @@ import wandb
 import yaml
 from models.AC import A2C
 from models.AActorCritic import AActorCritic
+from models.PPO import PPO
+
 
 
 with open("config.yaml") as f:
@@ -29,7 +31,7 @@ critic_weightage = cfgm["critic_weightage"]
 
 re=[]
 
-def ActorCritic(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=gamma, environ=environ):
+def run_ActorCritic(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=gamma, environ=environ):
     global re
     env = gym.make(environ, max_episode_steps=1000)
     eval_env = gym.make(environ)
@@ -82,7 +84,7 @@ def ActorCritic(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=g
     return rewards
 
 
-def ActorCritic2(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=gamma, environ=environ):
+def run_ActorCritic2(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=gamma, environ=environ):
     global re
     env = gym.make(environ, max_episode_steps=1000)
     eval_env = gym.make(environ)
@@ -137,17 +139,16 @@ def ActorCritic2(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=
     return rewards
 
 
-def PPO(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=gamma, environ=environ):
+def run_PPO(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=gamma, environ=environ):
     global re
     env = gym.make(environ, max_episode_steps=1000)
     eval_env = gym.make(environ)
     rewards=[]    
-    self.critic_weightage = critic_weightage
-    agent = AActorCritic(env.action_space.n, 
+    agent = PPO(env.action_space.n, 
                         env.observation_space.shape[0],
                         gamma=gamma,
                         lr=learning_rate,
-                        critic_weightage = self.critic_weightage)
+                        critic_weightage = 1)
     print("---------------------------------------------------------")
     print("running PPO")
     print("---------------------------------------------------------")
@@ -206,11 +207,11 @@ if __name__ == "__main__":
     }
     )
     if algo == "AC_Base":
-        rewards=ActorCritic()
+        rewards=run_ActorCritic()
     elif algo == "AC":
-        rewards=ActorCritic2()
+        rewards=run_ActorCritic2()
     else:
-        rewards=PPO()
+        rewards=run_PPO()
     
     wandb.finish()
 

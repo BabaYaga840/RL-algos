@@ -59,7 +59,7 @@ class PPONetwork(nn.Module):
     self.num = num
     self.reward=[]
     self.log_prob=[]
-    self.critic_weightage=1
+    self.critic_weightage=critic_weightage
     self.old_dist=None
     self.epsilon=0.2
     
