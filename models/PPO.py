@@ -9,7 +9,7 @@ import torch.nn.functional as F
 import gym
 import matplotlib.pyplot as plt
 import wandb
-from utils.qv import ActorCriticNetwork
+from utils.qv import PPONetwork
 
 
 class PPO():

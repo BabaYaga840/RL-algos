@@ -26,15 +26,16 @@ class ActorCriticNetwork(nn.Module):
     
   def forward(self, x):
     x = F.relu(self.layer1(x))
-    x = self.layera(x)
     y = self.layerc(x)
+    x = self.layera(x)
     x = nn.functional.softmax(x, dim=0)
     return x,y
 
 
-  def optimize(self,states,actions,FinalRewards,lossc,entropy):
+  def optimize(self,states,actions,FinalRewards,lossc):
     for state,action,G in zip(states,actions,FinalRewards):
       prob, value = self(torch.from_numpy(state))
+      entropy = prob.entropy().mean()
       dist=Categorical(probs=prob)
       log_prob=dist.log_prob(torch.tensor(action))
       
@@ -65,13 +66,13 @@ class PPONetwork(nn.Module):
     
   def forward(self, x):
     x = F.relu(self.layer1(x))
-    x = self.layera(x)
     y = self.layerc(x)
+    x = self.layera(x)
     x = nn.functional.softmax(x, dim=0)
     return x,y
 
 
-  def optimize(self,states1,actions1,FinalRewards1,lossc,entropy):
+  def optimize(self,states1,actions1,FinalRewards1,lossc):
     for i in range(self.epochs):
       sample_indices = np.random.choice(arr.size, size=3, replace=False)
       states=states1[sample_indices]
@@ -80,7 +81,8 @@ class PPONetwork(nn.Module):
       if self.old_dist == None:
         self.old_dist = Categorical(probs=self(torch.from_numpy(state)))
       for state,action,G in zip(states,actions,FinalRewards):
-        prob=self(torch.from_numpy(state))
+        prob, value=self(torch.from_numpy(state))
+        entropy = prob.entropy().mean()
         dist=Categorical(probs=prob)
         log_prob = dist.log_prob(torch.tensor(action))
         old_log_prob = self.old_dist.log_prob(torch.tensor(action))
