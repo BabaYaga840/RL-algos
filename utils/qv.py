@@ -76,7 +76,11 @@ class PPONetwork(nn.Module):
   def optimize(self,states1,actions1,FinalRewards1,vlosses1):
     for i in range(self.epochs):
       sample_indices = np.random.choice(len(states1), size=min(5,len(states1)), replace=False)
-      vlosses=vlosses1[sample_indices]
+      vlosses1=np.array(vlosses1)
+      states1=np.array(states1)
+      actions1=np.array(actions1)
+      FinalRewards1=np.array(FinalRewards1)
+      vlosses=[vlosses1[i] for i in sample_indices]
       states=states1[sample_indices]
       actions=actions1[sample_indices]
       FinalRewards=FinalRewards1[sample_indices]
@@ -97,8 +101,11 @@ class PPONetwork(nn.Module):
         self.optimizer.zero_grad()  
         wandb.log({f"actor loss_actor": lossa})
         wandb.log({f"critic loss_critic": lossc})
-        loss = lossa + critic_weightage * lossc - 0.001 * entropy
+        loss = lossa + self.critic_weightage * lossc - 0.001 * entropy
         self.old_dist = dist
-        loss.backward()  
-        self.optimizer.step()  
+        loss.backward(retain_graph=True)
+        del prob, value, dist, entropy, log_prob, old_log_prob, ratio, clipped_ratio, lossa, loss
+        self.optimizer.step()
+    for vloss in vlosses1:
+      del vloss
 
