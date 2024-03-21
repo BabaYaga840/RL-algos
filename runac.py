@@ -181,6 +181,7 @@ def run_PPO(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=gamma
 
         FinalRewards=[]
         value_loss=torch.tensor(0)
+        values_losses=[]
         for i in range(len(rewards)):
             G=0.0
             for j,r in enumerate(rewards[i:]):
@@ -188,8 +189,9 @@ def run_PPO(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=gamma
                 value_loss = value_loss + (delqs[i]-G)**2
                 #agent.q_net.optimize(torch.tensor(G),delqs[i])
                 G=G+delqs[i+1]-delqs[i]
+            values_losses.append(value_loss)
             FinalRewards.append(G)
-        agent.policy_net.optimize(states,actions,rewards,value_loss)
+        agent.policy_net.optimize(states,actions,rewards,value_losses)
     return rewards
 
 
