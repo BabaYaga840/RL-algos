@@ -89,12 +89,11 @@ def run_ActorCritic2(n_timesteps=num_iterations, learning_rate=learning_rate, ga
     env = gym.make(environ, max_episode_steps=1000)
     eval_env = gym.make(environ)
     rewards=[]    
-    self.critic_weightage = critic_weightage
     agent = AActorCritic(env.action_space.n, 
                         env.observation_space.shape[0],
                         gamma=gamma,
                         lr=learning_rate,
-                        critic_weightage = self.critic_weightage)
+                        critic_weightage = critic_weightage)
     print("---------------------------------------------------------")
     print("running advantage actor critic with entropy")
     print("---------------------------------------------------------")
@@ -135,7 +134,7 @@ def run_ActorCritic2(n_timesteps=num_iterations, learning_rate=learning_rate, ga
                 #agent.q_net.optimize(torch.tensor(G),delqs[i])
                 G=G+delqs[i+1]-delqs[i]
             FinalRewards.append(G)
-        agent.policy_net.optimize(states,actions,rewards,value_loss)
+        agent.policy_net.optimize(states,actions, FinalRewards,delqs)
     return rewards
 
 

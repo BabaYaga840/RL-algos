@@ -28,25 +28,29 @@ class ActorCriticNetwork(nn.Module):
     x = F.relu(self.layer1(x))
     y = self.layerc(x)
     x = self.layera(x)
-    x = nn.functional.softmax(x, dim=0)
+    x = nn.functional.softmax(x, dim=-1)
     return x,y
 
 
-  def optimize(self,states,actions,FinalRewards,lossc):
+  def optimize(self,states,actions,FinalRewards,delqs):
+    torch.autograd.set_detect_anomaly(True)
     for state,action,G in zip(states,actions,FinalRewards):
       prob, value = self(torch.from_numpy(state))
-      entropy = prob.entropy().mean()
       dist=Categorical(probs=prob)
+      entropy = dist.entropy()
       log_prob=dist.log_prob(torch.tensor(action))
       
       lossa = -log_prob*G
-      lossc = self.criterion(value, G)
+      lossc = self.criterion(torch.tensor(delqs), torch.tensor(G))
       self.optimizer.zero_grad()  
       wandb.log({f"actor loss_actor": lossa})
       wandb.log({f"critic loss_critic": lossc})
-      loss = lossa + critic_weightage * lossc - 0.001 * entropy
-      loss.backward()  
+      loss = lossa + self.critic_weightage * lossc - 0.001 * entropy
+      loss.backward(retain_graph=True)  
+      del prob, value, dist, entropy, log_prob, loss 
       self.optimizer.step()
+    for vloss in lossc:
+      del lossc
 
 class PPONetwork(nn.Module):
   def __init__(self, state_s, action_s, learning_rate, num=0, critic_weightage=1):
@@ -69,14 +73,13 @@ class PPONetwork(nn.Module):
     x = F.relu(self.layer1(x))
     y = self.layerc(x)
     x = self.layera(x)
-    x = nn.functional.softmax(x, dim=0)
+    x = nn.functional.softmax(x, dim=-1)
     return x,y
 
 
   def optimize(self,states1,actions1,FinalRewards1,vlosses1):
     for i in range(self.epochs):
       sample_indices = np.random.choice(len(states1), size=min(5,len(states1)), replace=False)
-      vlosses1=np.array(vlosses1)
       states1=np.array(states1)
       actions1=np.array(actions1)
       FinalRewards1=np.array(FinalRewards1)
@@ -108,4 +111,6 @@ class PPONetwork(nn.Module):
         self.optimizer.step()
     for vloss in vlosses1:
       del vloss
+    for action in actions:
+      del actions
 
