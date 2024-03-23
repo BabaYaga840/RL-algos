@@ -132,7 +132,7 @@ def run_ActorCritic2(n_timesteps=num_iterations, learning_rate=learning_rate, ga
                 G +=r*(gamma**j)
                 value_loss = value_loss + (delqs[i]-G)**2
                 #agent.q_net.optimize(torch.tensor(G),delqs[i])
-                G=G+delqs[i+1]-delqs[i]
+                G=G+ delqs[i + 1] - delqs[i].detach()
             FinalRewards.append(G)
         agent.policy_net.optimize(states,actions, FinalRewards,delqs)
     return rewards
@@ -187,7 +187,7 @@ def run_PPO(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=gamma
                 G +=r*(gamma**j)
                 value_loss = value_loss + (delqs[i]-G)**2
                 #agent.q_net.optimize(torch.tensor(G),delqs[i])
-                G=G+delqs[i+1]-delqs[i]
+                G=G+ delqs[i + 1] - delqs[i].detach()
             value_losses.append(value_loss)
             FinalRewards.append(G)
         agent.policy_net.optimize(states,actions,rewards,value_losses)
