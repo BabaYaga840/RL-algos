@@ -43,9 +43,11 @@ class ActorCriticNetwork(nn.Module):
       lossa = -log_prob*G
       lossc = self.criterion(torch.tensor(delqs), torch.tensor(G))
       self.optimizer.zero_grad()  
-      wandb.log({f"actor loss_actor": lossa})
-      wandb.log({f"critic loss_critic": lossc})
+      wandb.log({f"loss_actor": lossa})
+      wandb.log({f"loss_critic": lossc})
+      wandb.log({f"entropy": entropy})
       loss = lossa + self.critic_weightage * lossc - 0.001 * entropy
+      wandb.log({f"loss_total": loss})
       loss.backward(retain_graph=True)  
       del prob, value, dist, entropy, log_prob, loss 
       self.optimizer.step()
@@ -102,9 +104,11 @@ class PPONetwork(nn.Module):
         lossa = -torch.min(old_log_prob * G * ratio, old_log_prob*G * clipped_ratio)
         #lossc = self.criterion(value, G)
         self.optimizer.zero_grad()  
-        wandb.log({f"actor loss_actor": lossa})
-        wandb.log({f"critic loss_critic": lossc})
+        wandb.log({f"loss_actor": lossa})
+        wandb.log({f"loss_critic": lossc})
+        wandb.log({f"entropy": entropy})
         loss = lossa + self.critic_weightage * lossc - 0.001 * entropy
+        wandb.log({f"loss_total": loss})
         self.old_dist = dist
         loss.backward(retain_graph=True)
         del prob, value, dist, entropy, log_prob, old_log_prob, ratio, clipped_ratio, lossa, loss
