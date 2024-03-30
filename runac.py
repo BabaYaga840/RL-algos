@@ -122,6 +122,7 @@ def run_ActorCritic2(n_timesteps=num_iterations, learning_rate=learning_rate, ga
           state=next_state
         env.close()
         wandb.log({"rewards": total_reward})
+        wandb.log({"steps": iteration})
 
 
         FinalRewards=[]
@@ -177,6 +178,7 @@ def run_PPO(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=gamma
           state=next_state
         env.close()
         wandb.log({"rewards": total_reward})
+        wandb.log({"steps": iteration})
 
 
         FinalRewards=[]
@@ -186,11 +188,11 @@ def run_PPO(n_timesteps=num_iterations, learning_rate=learning_rate, gamma=gamma
             G=0.0
             for j,r in enumerate(rewards[i:]):
                 G +=r*(gamma**j)
-                value_loss = value_loss + (delqs[i]-G)**2
+                #value_loss = value_loss + (delqs[i]-G)**2
                 #agent.q_net.optimize(torch.tensor(G),delqs[i])
                 G_next = delqs[i + 1].clone().detach()
                 G = G + G_next - delqs[i].detach()
-            value_losses.append(value_loss)
+            #value_losses.append(value_loss)
             FinalRewards.append(G)
         agent.policy_net.optimize(states,actions,rewards,value_losses)
     return rewards
