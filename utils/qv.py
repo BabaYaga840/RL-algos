@@ -34,7 +34,7 @@ class ActorCriticNetwork(nn.Module):
     return x,y
 
 
-  def optimize(self,states,actions,FinalRewards,delqs):
+  """def optimize(self,states,actions,FinalRewards,delqs):
     torch.autograd.set_detect_anomaly(True)
     for state,action,G,delq in zip(states,actions,FinalRewards,delqs):
       prob, value = self((torch.from_numpy(state)).to(self.device))
@@ -50,11 +50,26 @@ class ActorCriticNetwork(nn.Module):
       wandb.log({f"entropy": entropy})
       loss = lossa + self.critic_weightage * lossc - 0.1 * entropy
       wandb.log({f"loss_total": loss})
-      loss.backward(retain_graph=True)  
-      del prob, value, dist, entropy, log_prob, loss 
-      self.optimizer.step()
-    for vloss in lossc:
-      del lossc
+      loss.backward()  
+      #del prob, value, dist, entropy, log_prob, loss 
+      self.optimizer.step()"""
+    
+  def optimize(advantages, log_probs, entropies):
+    advantages = np.array(advantages)
+    log_probs = np.array(log_probs) 
+    entropies = np.array(entropies)
+    lossa = -(log_probs * advantages.detach()).mean()
+    lossc = advantages.pow(2).mean()
+    entropy = np.sum(entropies)
+    loss = lossa + self.critic_weightage * lossc - 0.1 * entropy
+
+    wandb.log({f"loss_actor": lossa})
+    wandb.log({f"loss_critic": lossc})
+    wandb.log({f"entropy": entropy})
+    wandb.log({f"loss_total": loss})
+
+    loss.backward()  
+    self.optimizer.step()
 
 class PPONetwork(nn.Module):
   def __init__(self, state_s, action_s, learning_rate, num=0, critic_weightage=1):
