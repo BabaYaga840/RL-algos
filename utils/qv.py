@@ -54,15 +54,17 @@ class ActorCriticNetwork(nn.Module):
       #del prob, value, dist, entropy, log_prob, loss 
       self.optimizer.step()"""
     
-  def optimize(advantages, log_probs, entropies):
-    advantages = np.array(advantages)
-    log_probs = np.array(log_probs) 
-    entropies = np.array(entropies)
-    lossa = -(log_probs * advantages.detach()).mean()
-    lossc = advantages.pow(2).mean()
+  def optimize(self, advantages, log_probs, entropies):
+    #advantages = np.array(advantages)
+    #log_probs = np.array(log_probs) 
+    #entropies = np.array(entropies)
+    lossa = -torch.tensor([a * b.detach() for a,b in zip(log_probs, advantages)], requires_grad=True).mean()
+    lossc = torch.tensor(advantages, requires_grad=True).pow(2).mean()
+    #entropy = torch.sum(torch.tensor(entropies))
     entropy = np.sum(entropies)
     loss = lossa + self.critic_weightage * lossc - 0.1 * entropy
 
+    
     wandb.log({f"loss_actor": lossa})
     wandb.log({f"loss_critic": lossc})
     wandb.log({f"entropy": entropy})

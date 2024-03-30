@@ -30,7 +30,9 @@ class AActorCritic():
     probs, value = self.policy_net(s.to(self.device))
     m = Categorical(probs)
     action = m.sample()
-    return action.item(), value
+    log_prob=m.log_prob(torch.tensor(action))
+    entropy=m.entropy().mean()
+    return action.item(), value, log_prob, entropy
 
   def get_qval(self,s):
     s = np.array(s)

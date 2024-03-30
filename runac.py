@@ -77,7 +77,7 @@ def run_ActorCritic(n_timesteps=num_iterations, learning_rate=learning_rate, gam
                 G +=r*(gamma**j)
                 value_loss = value_loss + (delqs[i]-G)**2
                 #agent.q_net.optimize(torch.tensor(G),delqs[i])
-                G=G+delqs[i+1]-delqs[i]
+                #G=G+delqs[i+1]-delqs[i]
             FinalRewards.append(G)
         agent.policy_net.optimize(states,actions,rewards)
         value_loss.backward()
@@ -107,8 +107,10 @@ def run_ActorCritic2(n_timesteps=num_iterations, learning_rate=learning_rate, ga
         actions=[]
         states=[]
         delqs=[]
+        log_probs=[]
+        entropies=[]
         while not done:
-          action, delq = agent.get(state)
+          action, delq, log_prob, entropy = agent.get(state)
           #entropy += entropy + action.entropy().mean()
           next_state, reward, done, truncated = env.step(int(action))
           reward = reward
@@ -116,6 +118,8 @@ def run_ActorCritic2(n_timesteps=num_iterations, learning_rate=learning_rate, ga
           rewards.append(reward)
           states.append(state)
           delqs.append(delq)
+          entropies.append(entropy)
+          log_probs.append(log_prob)
           if done:
               delqs.append(agent.get_qval(next_state))
           total_reward += reward
@@ -132,11 +136,12 @@ def run_ActorCritic2(n_timesteps=num_iterations, learning_rate=learning_rate, ga
             for j,r in enumerate(rewards[i:]):
                 G +=r*(gamma**j)
                 value_loss = value_loss + (delqs[i]-G)**2
-                #agent.q_net.optimize(torch.tensor(G),delqs[i])
-                G_next = delqs[i + 1].clone().detach()
-                G = G + G_next - delqs[i].detach()
+                #G_next = delqs[i + 1].clone().detach()
+                #G = G + G_next - delqs[i].detach()
             FinalRewards.append(G)
-        agent.policy_net.optimize(states,actions, FinalRewards,delqs)
+        advantages = [a-b for a,b in zip(FinalRewards, delqs)]
+        agent.policy_net.optimize(advantages, log_probs, entropies)
+        #agent.policy_net.optimize(states,actions, FinalRewards,delqs)
     return rewards
 
 
